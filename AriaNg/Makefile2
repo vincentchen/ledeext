@@ -1,0 +1,47 @@
+#
+# Copyright (C) 2015-2016 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v3.
+#
+
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=AriaNg
+PKG_VERSION:=1
+PKG_RELEASE:=1
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/$(PKG_NAME)
+	SECTION:=luci
+	CATEGORY:=LuCI
+	TITLE:=AriaNg
+	DEPENDS:=
+	URL:=
+endef
+
+define Package/$(PKG_NAME)/description
+  web ui for aria2
+endef
+
+define Build/Prepare
+endef
+
+define Build/Configure
+endef
+
+define Build/Compile
+endef
+
+
+define Package/$(PKG_NAME)/install
+        $(INSTALL_DIR) $(1)/www/web
+	$(INSTALL_DIR) $(1)/www/css
+	$(INSTALL_DIR) $(1)/www/fonts
+	$(INSTALL_DIR) $(1)/www/js
+	$(INSTALL_DIR) $(1)/www/langs
+
+	$(CP) -r ./file/web $(1)/www/web
+endef
+
+$(eval  $(call  BuildPackage,$(PKG_NAME)))
