@@ -1,0 +1,74 @@
+#!/bin/sh /etc/rc.common
+#
+# Copyright (C) 2015 OpenWrt-dist
+# Copyright (C) 2016 fw867 <ffkykzs@gmail.com>
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
+#
+
+START=99
+
+CONFIG=protocolfiltering
+
+uci_get_by_type() {
+	local index=0
+	if [ -n $4 ]; then
+		index=$4
+	fi
+	local ret=$(uci get $CONFIG.@$1[$index].$2 2>/dev/null)
+	echo ${ret:=$3}
+}
+
+is_true() {
+	case $1 in
+		1|on|true|yes|enabled) echo 0;;
+		*) echo 1;;
+	esac
+}
+
+load_config() {
+	ENABLED=$(uci_get_by_type basic enable)
+	return $(is_true $ENABLED)
+}
+
+add_rule(){
+algos=$(uci_get_by_type basic algos)
+for i in $(seq 0 100)
+	do
+		enable=$(uci_get_by_type macbind enable '' $i)
+		macaddr=$(uci_get_by_type macbind macaddr '' $i)
+		timeon=$(uci_get_by_type macbind timeon '' $i)
+		timeoff=$(uci_get_by_type macbind timeoff '' $i)
+		ndpi=$(uci_get_by_type macbind ndpi '' $i)
+		if [ -z $enable ] || [ -z $ndpi ]; then
+			break
+		fi
+		if [ -z $timeon ] || [ -z $timeoff ]; then
+      settime=""
+    else
+      settime="-m time --kerneltz --timestart $timeon --timestop $timeoff"
+    fi
+		if [ "$enable" == "1" ]; then
+      if [ -z $macaddr ]; then
+        iptables -I PROTOCOL_FILTER $settime -m ndpi --$ndpi -j DROP
+      else
+        iptables -I PROTOCOL_FILTER $settime -d $macaddr -m ndpi --$ndpi -j DROP
+        unset "$macaddr"
+      fi
+     fi
+done
+}
+
+start(){
+	! load_config && exit 0
+	iptables -L FORWARD|grep -c PROTOCOL_FILTER 2>/dev/null && [ $? -eq 0 ] && exit 0;
+	iptables -t filter -N PROTOCOL_FILTER
+	iptables -I FORWARD -m comment --comment "Rule For Control" -j PROTOCOL_FILTER
+  add_rule
+}
+stop(){
+  iptables -D FORWARD -m comment --comment "Rule For Control" -j PROTOCOL_FILTER
+  iptables -t filter -F PROTOCOL_FILTER
+  iptables -t filter -X PROTOCOL_FILTER
+}

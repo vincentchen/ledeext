@@ -1,0 +1,52 @@
+#!/bin/sh /etc/rc.common
+#
+# Copyright (C) 2015 OpenWrt-dist
+# Copyright (C) 2016 Chen RuiWei <crwbak@gmail.com>
+#
+# This is free software, licensed under the GNU General Public License v3.
+# See /LICENSE for more information.
+#
+
+START=99
+STOP=10
+
+CONFIG=softethervpn
+
+get_config()
+{
+	config_get_bool enable $1 enable 0
+}
+
+uci_get_by_type() {
+	local index=0
+	if [ -n $4 ]; then
+		index=$4
+	fi
+	local ret=$(uci get $CONFIG.@$1[$index].$2 2>/dev/null)
+	echo ${ret:=$3}
+}
+
+del_rule()
+{
+	openvpnport=$(cat /usr/share/softethervpn/vpn_server.config 2>/dev/null|grep OpenVPN_UdpPortList | awk -F " " '{print $3}')
+	iptables -D zone_wan_input -p udp -m multiport --dport 500,1701,4500 -m comment --comment "Rule for softethervpn" -j ACCEPT 2>/dev/null
+	iptables -D zone_wan_forward -p esp -m comment --comment "Rule for softethervpn" -j zone_lan_dest_ACCEPT 2>/dev/null
+	[ -n "$openvpnport" ] && iptables -D zone_wan_input -p udp --dport $openvpnport -m comment --comment "Rule for softethervpn" -j ACCEPT 2>/dev/null
+	[ -n "$openvpnport" ] && iptables -D zone_wan_input -p tcp --dport $openvpnport -m comment --comment "Rule for softethervpn" -j ACCEPT 2>/dev/null
+	iptables -D zone_wan_input -p tcp --dport 443 -m comment --comment "Rule for softethervpn" -j ACCEPT 2>/dev/null
+}
+
+start()
+{
+	config_load softethervpn
+	config_foreach get_config softether
+	[ $enable -ne 1 ] && exit 0
+	/usr/bin/env LANG=en_US.UTF-8 /usr/share/softethervpn/vpnserver start
+	/usr/share/softethervpn/firewall.include
+}
+
+stop()
+{
+	/usr/bin/env LANG=en_US.UTF-8 /usr/share/softethervpn/vpnserver stop
+  del_rule
+}

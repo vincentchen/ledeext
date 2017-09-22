@@ -1,0 +1,6 @@
+2017/07/30 05:57:20 [W] [vhost.go:129] get hostname from http/https request error: readHandshake: type[114] is not clientHello
+2017/07/30 05:57:20 [W] [vhost.go:129] get hostname from http/https request error: Unknow error
+2017/07/30 06:46:19 [W] [vhost.go:129] get hostname from http/https request error: malformed HTTP request "\x16\x03\x01\x00\x96\x01\x00\x00\x92\x03\x03\xa9\xe7ǐ\xc6\xe3\xe3z\xec*DV\x16\xfa֙\xfa\xe6s\xcf\xfd\xe7N\x8d\x8cբ\x05\x1f\xcag\x8c\x00\x006\xc0,\xc0"
+2017/07/30 07:20:50 [W] [service.go:214] Accept new mux stream error: broken pipe
+2017/07/30 07:20:50 [W] [service.go:214] Accept new mux stream error: broken pipe
+2017/07/30 16:52:57 [W] [vhost.go:129] get hostname from http/https request error: EOF

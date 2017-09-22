@@ -1,0 +1,13 @@
+
+config global
+	option enable '1'
+
+config server
+	option obfs 'http_simple'
+	option timeout '300'
+	option fast_open 'true'
+	option server_port '138'
+	option encrypt_method 'chacha20'
+	option protocol 'auth_sha1_v4'
+	option password 'vincent8chan8'
+
