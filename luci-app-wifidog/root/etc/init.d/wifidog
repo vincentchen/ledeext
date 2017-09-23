@@ -51,7 +51,6 @@ HTTPDMaxConn $gateway_connmax
 TrustedMACList $myz_mac
 
 FirewallRuleSet global {
-FirewallRule allow to 61.139.2.69
 FirewallRule allow to 8.8.8.8
 FirewallRule allow to 114.114.114.114
 }

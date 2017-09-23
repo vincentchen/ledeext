@@ -1,5 +1,4 @@
 #!/bin/sh
-
 uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@wifidog[-1]
 	add ucitrack wifidog
