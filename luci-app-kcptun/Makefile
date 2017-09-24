@@ -38,7 +38,7 @@ if [ -z "$${IPKG_INSTROOT}" ]; then
 fi
 chmod 755 $${IPKG_INSTROOT}/etc/init.d/kcptun >/dev/null 2>&1
 chmod 755 $${IPKG_INSTROOT}/usr/bin/kcpclient  >/dev/null 2>&1
-$${IPKG_INSTROOT}/etc/init.d/kcptun enable >/dev/null 2>&1
+#$${IPKG_INSTROOT}/etc/init.d/kcptun enable >/dev/null 2>&1
 exit 0
 endef
 

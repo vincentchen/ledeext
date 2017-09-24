@@ -28,7 +28,7 @@ uci_get_by_type() {
 
 del_rule()
 {
-	openvpnport=$(cat /usr/share/softethervpn/vpn_server.config 2>/dev/null|grep OpenVPN_UdpPortList | awk -F " " '{print $3}')
+	openvpnport=$(cat /usr/libexec/softethervpn/vpn_server.config 2>/dev/null|grep OpenVPN_UdpPortList | awk -F " " '{print $3}')
 	iptables -D zone_wan_input -p udp -m multiport --dport 500,1701,4500 -m comment --comment "Rule for softethervpn" -j ACCEPT 2>/dev/null
 	iptables -D zone_wan_forward -p esp -m comment --comment "Rule for softethervpn" -j zone_lan_dest_ACCEPT 2>/dev/null
 	[ -n "$openvpnport" ] && iptables -D zone_wan_input -p udp --dport $openvpnport -m comment --comment "Rule for softethervpn" -j ACCEPT 2>/dev/null
@@ -41,12 +41,12 @@ start()
 	config_load softethervpn
 	config_foreach get_config softether
 	[ $enable -ne 1 ] && exit 0
-	/usr/bin/env LANG=en_US.UTF-8 /usr/share/softethervpn/vpnserver start
-	/usr/share/softethervpn/firewall.include
+	/usr/bin/env LANG=en_US.UTF-8 /usr/libexec/softethervpn/vpnserver start
+	/usr/libexec/softethervpn/firewall.include
 }
 
 stop()
 {
-	/usr/bin/env LANG=en_US.UTF-8 /usr/share/softethervpn/vpnserver stop
+	/usr/bin/env LANG=en_US.UTF-8 /usr/libexec/softethervpn/vpnserver stop
   del_rule
 }

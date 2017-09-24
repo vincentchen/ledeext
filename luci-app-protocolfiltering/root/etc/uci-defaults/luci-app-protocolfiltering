@@ -1,0 +1,8 @@
+#!/bin/sh
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@protocolfiltering[-1]
+	add ucitrack protocolfiltering
+	set ucitrack.@protocolfiltering[-1].init=protocolfiltering
+	commit ucitrack
+EOF
+exit 0
