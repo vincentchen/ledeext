@@ -7,14 +7,23 @@ local uci  = require "luci.model.uci".cursor()
 local util = require "luci.util"
 local i18n = require "luci.i18n"
 
-module ("luci.model.kcptun", package.seeall)
+module("luci.model.kcptun", package.seeall)
 
 local kcptun_api = "https://api.github.com/repos/xtaci/kcptun/releases/latest"
 local luci_api = "https://api.github.com/repos/kuoruan/luci-app-kcptun/releases/latest"
-local wget = "/usr/bin/wget"
-local wget_args = { "-q", "--no-check-certificate", "--tries=1", "--connect-timeout=5", "--read-timeout=20" }
 
-local function exec(cmd, args, writer)
+local wget = "/usr/bin/wget"
+local wget_args = { "--no-check-certificate", "--quiet", "--timeout=10", "--tries=2" }
+local command_timeout = 40
+
+local function _unpack(t, i)
+	i = i or 1
+	if t[i] ~= nil then
+		return t[i], _unpack(t, i + 1)
+	end
+end
+
+local function exec(cmd, args, writer, timeout)
 	local os = require "os"
 	local nixio = require "nixio"
 
@@ -24,17 +33,34 @@ local function exec(cmd, args, writer)
 	if pid > 0 then
 		fdo:close()
 
-		while true do
-			local buffer = fdi:read(2048)
-			local wpid, stat, code = nixio.waitpid(pid, "nohang")
+		if writer or timeout then
+			local starttime = os.time()
+			while true do
+				if timeout and os.difftime(os.time(), starttime) >= timeout then
+					nixio.kill(pid, nixio.const.SIGTERM)
+					return 1
+				end
 
-			if writer and buffer and #buffer > 0 then
-				writer(buffer)
-			end
+				if writer then
+					local buffer = fdi:read(2048)
+					if buffer and #buffer > 0 then
+						writer(buffer)
+					end
+				end
 
-			if wpid and stat == "exited" then
-				break
+				local wpid, stat, code = nixio.waitpid(pid, "nohang")
+
+				if wpid and stat == "exited" then
+					return code
+				end
+
+				if not writer and timeout then
+					nixio.nanosleep(1)
+				end
 			end
+		else
+			local wpid, stat, code = nixio.waitpid(pid)
+			return wpid and stat == "exited" and code
 		end
 	elseif pid == 0 then
 		nixio.dup(fdo, nixio.stdout)
@@ -109,7 +135,7 @@ local function get_api_json(url)
 	local jsonc = require "luci.jsonc"
 
 	local output = { }
-	exec(wget, { unpack(wget_args), "-O-", url },
+	exec(wget, { "-O-", url, _unpack(wget_args) },
 		function(chunk) output[#output + 1] = chunk end)
 
 	local json_content = util.trim(table.concat(output))
@@ -127,7 +153,7 @@ end
 
 function get_current_log_file(type)
 	local log_folder = get_config_option("log_folder", "/var/log/kcptun")
-	return "%s/%s.%s.log" % { log_folder, type, 'general' }
+	return "%s/%s.%s.log" % { log_folder, type, "general" }
 end
 
 function is_running(client)
@@ -185,7 +211,6 @@ function check_kcptun(arch)
 	end
 
 	local json = get_api_json(kcptun_api)
-	util.perror(json)
 
 	if json.tag_name == nil then
 		return {
@@ -283,30 +308,64 @@ function check_luci()
 	}
 end
 
-function update_kcptun(url, file_subfix)
-	local tmp_dir = "/tmp/kcptun_tmp"
-	local kcptun_tmp_file = tmp_dir .. "/kcptun.tar.gz"
+function download_kcptun(url)
+	if not url or url == "" then
+		return {
+			code = 1,
+			error = i18n.translate("Download url is required.")
+		}
+	end
 
-	exec("/bin/rm", { "-rf", tmp_dir })
-	exec("/bin/mkdir", { "-m", "777", "-p", tmp_dir })
+	sys.call("/bin/rm -f /tmp/kcptun_download.*")
 
-	exec(wget, { unpack(wget_args), "-O", kcptun_tmp_file, url })
+	local tmp_file = util.trim(util.exec("mktemp -u -t kcptun_download.XXXXXX"))
+
+	local result = exec(wget, {
+		"-O", tmp_file, url, _unpack(wget_args) }, nil, command_timeout) == 0
+
+	if not result then
+		exec("/bin/rm", { "-f", tmp_file })
+		return {
+			code = 1,
+			error = i18n.translatef("File download failed or timed out: %s", url)
+		}
+	end
+
+	return {
+		code = 0,
+		file = tmp_file
+	}
+end
+
+function extract_kcptun(file, subfix)
+	if not file or file == "" or not fs.access(file) then
+		return {
+			code = 1,
+			error = i18n.translate("File path required.")
+		}
+	end
+
+	sys.call("/bin/rm -rf /tmp/kcptun_extract.*")
+	local tmp_dir = util.trim(util.exec("mktemp -d -t kcptun_extract.XXXXXX"))
 
 	local output = { }
-	exec("/bin/tar", { "-C", tmp_dir, "-zxvf", kcptun_tmp_file },
+	exec("/bin/tar", { "-C", tmp_dir, "-zxvf", file },
 		function(chunk) output[#output + 1] = chunk end)
 
-	local new_file
+	local files = util.split(table.concat(output))
 
-	for _, f in pairs(output) do
-		if f:match("client_linux_%s" % file_subfix) then
+	exec("/bin/rm", { "-f", file })
+
+	local new_file = nil
+	for _, f in pairs(files) do
+		if f:match("client_linux_%s" % subfix) then
 			new_file = tmp_dir .. "/" .. util.trim(f)
 			break
 		end
 	end
 
 	if not new_file then
-		for _, f in pairs(output) do
+		for _, f in pairs(files) do
 			if f:match("client_") then
 				new_file = tmp_dir .. "/" .. util.trim(f)
 				break
@@ -318,17 +377,31 @@ function update_kcptun(url, file_subfix)
 		exec("/bin/rm", { "-rf", tmp_dir })
 		return {
 			code = 1,
-			error = i18n.translatef("File download failed or timed out: %s", url)
+			error = i18n.translatef("Can't find client in file: %s", file)
 		}
 	end
 
-	local version = get_kcptun_version(new_file)
-	if version == "" then
-		exec("/bin/rm", { "-rf", tmp_dir })
+	return {
+		code = 0,
+		file = new_file
+	}
+end
+
+function move_kcptun(file)
+	if not file or file == "" or not fs.access(file) then
+		sys.call("/bin/rm -rf /tmp/kcptun_extract.*")
 		return {
 			code = 1,
-			file = new_file,
-			error = i18n.translate("The downloaded file is not suitable for current device. Please reselect ARCH.")
+			error = i18n.translate("Client file is required.")
+		}
+	end
+
+	local version = get_kcptun_version(file)
+	if version == "" then
+		sys.call("/bin/rm -rf /tmp/kcptun_extract.*")
+		return {
+			code = 1,
+			error = i18n.translate("The client file is not suitable for current device. Please reselect ARCH.")
 		}
 	end
 
@@ -340,7 +413,10 @@ function update_kcptun(url, file_subfix)
 		exec("/bin/mv", { "-f", client_file, client_file_bak })
 	end
 
-	if not fs.move(new_file, client_file) then
+	local result = exec("/bin/mv", { "-f", file, client_file }, nil, command_timeout) == 0
+
+	if not result or not fs.access(client_file) then
+		sys.call("/bin/rm -rf /tmp/kcptun_extract.*")
 		if client_file_bak then
 			exec("/bin/mv", { "-f", client_file_bak, client_file })
 		end
@@ -356,7 +432,7 @@ function update_kcptun(url, file_subfix)
 		exec("/bin/rm", { "-f", client_file_bak })
 	end
 
-	exec("/bin/rm", { "-rf", tmp_dir })
+	sys.call("/bin/rm -rf /tmp/kcptun_extract.*")
 
 	uci:set("kcptun", "general", "client_file", client_file)
 	uci:commit("kcptun")
@@ -365,25 +441,40 @@ function update_kcptun(url, file_subfix)
 end
 
 function update_luci(url)
-	local tmp_dir = "/tmp/luci_tmp"
-	local luci_tmp_file = tmp_dir .. "/luci-app-kcptun.ipk"
+	if not url or url == "" then
+		return {
+			code = 1,
+			error = i18n.translate("Download url is required.")
+		}
+	end
 
-	exec("/bin/rm", { "-rf", tmp_dir })
-	exec("/bin/mkdir", { "-m", "777", "-p", tmp_dir })
+	sys.call("/bin/rm -f /tmp/luci_kcptun.*.ipk")
 
-	exec(wget, { unpack(wget_args), "-O", luci_tmp_file, url })
+	local tmp_file = util.trim(util.exec("mktemp -u -t luci_kcptun.XXXXXX")) .. ".ipk"
 
-	local result = sys.call("opkg install --force-reinstall --force-overwrite %s" % luci_tmp_file) == 0
+	local result = exec("/usr/bin/wget", {
+		"-O", tmp_file, url, _unpack(wget_args) }, nil, command_timeout) == 0
 
 	if not result then
-		exec("/bin/rm", { "-rf", tmp_dir })
+		exec("/bin/rm", { "-f", tmp_file })
+		return {
+			code = 1,
+			error = i18n.translatef("File download failed or timed out: %s", url)
+		}
+	end
+
+	result = exec("/bin/opkg", {
+		"install", "--force-reinstall", "--force-overwrite", tmp_file }) == 0
+
+	if not result then
+		exec("/bin/rm", { "-f", tmp_file })
 		return {
 			code = 1,
 			error = i18n.translate("Package update failed.")
 		}
 	end
 
-	exec("/bin/rm", { "-rf", tmp_dir })
+	exec("/bin/rm", { "-f", tmp_file })
 	exec("/bin/rm", { "-rf", "/tmp/luci-indexcache", "/tmp/luci-modulecache" })
 
 	return { code = 0 }

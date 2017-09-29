@@ -1,261 +1,280 @@
 msgid ""
-msgstr "Content-Type: text/plain; charset=UTF-8\n"
+msgstr "Content-Type: text/plain; charset=UTF-8"
 
 msgid "2nd ACK"
-msgstr "2次 ACK 跨越重传"
+msgstr ""
 
 msgid "Alias"
-msgstr "别名"
+msgstr ""
 
 msgid "Auto"
-msgstr "自动"
+msgstr ""
 
 msgid ""
 "Auto expiration time(in seconds) for a single UDP connection, 0 to disable."
-msgstr "单个 UDP 连接的自动过期时间(秒)，设置 0 来禁用"
+msgstr ""
 
 msgid "CPU Architecture"
-msgstr "CPU 架构"
+msgstr ""
 
 msgid "Can't determine ARCH, or ARCH not supported. Please select manually."
-msgstr "无法自动确定 ARCH，或者不支持该 ARCH，请手动重新选择。"
+msgstr ""
+
+msgid "Can't find client in file: %s"
+msgstr ""
 
 msgid "Can't move new file to path: %s"
-msgstr "无法移动新文件到：%s"
+msgstr ""
 
-msgid "Check Kcptun"
-msgstr "检查 Kcptun"
+msgid "Check Kcptun Update"
+msgstr ""
 
-msgid "Check Luci"
-msgstr "检查 Luci"
+msgid "Check LuCI Update"
+msgstr ""
 
 msgid "Clear Log File"
-msgstr "清理日志文件"
+msgstr ""
 
 msgid "Click to Update"
-msgstr "点击更新"
+msgstr ""
 
 msgid "Client File"
-msgstr "客户端文件"
+msgstr ""
 
 msgid "Client Status"
-msgstr "客户端状态"
+msgstr ""
 
 msgid "Client Version"
-msgstr "客户端版本"
+msgstr ""
+
+msgid "Client file is required."
+msgstr ""
 
 msgid "Collecting data..."
-msgstr "正在收集数据..."
+msgstr ""
 
 msgid "DSCP(6bit)"
-msgstr "DSCP(6bit)"
+msgstr ""
 
 msgid "Disable"
-msgstr "禁用"
+msgstr ""
 
 msgid "Disable Compression"
-msgstr "禁用压缩"
+msgstr ""
 
 msgid "Disable Compression?"
-msgstr "是否禁用压缩?"
+msgstr ""
+
+msgid "Download url is required."
+msgstr ""
+
+msgid "Downloading..."
+msgstr ""
 
 msgid "Edit Server"
-msgstr "编辑服务端"
+msgstr ""
 
 msgid "Embedded Mode"
-msgstr "内置模式"
+msgstr ""
 
 msgid "Enable Logging"
-msgstr "启用日志记录"
+msgstr ""
 
 msgid "Enable nodelay Mode."
-msgstr "启用 nodelay 模式"
+msgstr ""
 
 msgid "Encrypt Method"
-msgstr "加密方式"
+msgstr ""
 
 msgid "Error get log data."
-msgstr "获取日志数据失败。"
+msgstr ""
+
+msgid "Extracting..."
+msgstr ""
 
 msgid "False"
-msgstr "否"
+msgstr ""
 
 msgid "File download failed or timed out: %s"
-msgstr "文件下载失败或超时：%s"
+msgstr ""
+
+msgid "File path required."
+msgstr ""
 
 msgid "General Settings"
-msgstr "基本设置"
+msgstr ""
 
 msgid "Get remote version info failed."
-msgstr "获取远程版本信息失败。"
+msgstr ""
 
 msgid "How long an expired connection can live(in sec), -1 to disable."
-msgstr "过期连接保留多长时间(秒)，设置 -1 来禁用"
+msgstr ""
 
 msgid "Invalid Client File."
-msgstr "客户端文件配置有误"
+msgstr ""
 
 msgid "Kcptun"
 msgstr ""
 
 msgid "Kcptun Client"
-msgstr "Kcptun 客户端"
+msgstr ""
 
 msgid "Key"
-msgstr "密码"
+msgstr ""
 
 msgid "Last 50 lines of log file:"
-msgstr "日志文件的最新 50 行："
+msgstr ""
 
 msgid "Last 50 lines of syslog:"
-msgstr "系统日志的最新 50 行："
+msgstr ""
 
 msgid "Listen Address"
-msgstr "监听地址"
+msgstr ""
 
 msgid "Loading"
-msgstr "正在加载..."
+msgstr ""
 
 msgid "Local Listen Host"
-msgstr "本地监听地址"
+msgstr ""
 
 msgid "Local Listen Port."
-msgstr "本地监听端口"
+msgstr ""
 
 msgid "Local Port"
-msgstr "本地端口"
+msgstr ""
 
 msgid "Local listen host."
-msgstr "本地监听主机"
+msgstr ""
 
 msgid "Log"
-msgstr "日志"
+msgstr ""
 
 msgid "Log Data"
-msgstr "日志数据"
+msgstr ""
 
 msgid "Log Folder"
-msgstr "日志文件夹"
+msgstr ""
 
 msgid "LuCI Version"
-msgstr "LuCI 版本"
+msgstr ""
 
 msgid "Make sure that the 'Client File' dictionary has enough space."
-msgstr "请确保“客户端文件”所在的文件夹具有足够的空间。"
+msgstr ""
 
 msgid "Maximum transmission unit of UDP packets."
-msgstr "UDP数据包的最大传输单元"
+msgstr ""
+
+msgid "Moving..."
+msgstr ""
 
 msgid ""
 "NAT keepalive interval to prevent your router from removing port mapping, "
 "default unit is seconds."
-msgstr "NAT Keepalive 包间隔时间(秒), 防止路由器删除端口映射"
+msgstr ""
 
 msgid "New version found, but failed to get new version download url."
-msgstr "发现新版本，但是获取下载地址失败。"
+msgstr ""
 
 msgid "No Update Found"
-msgstr "未发现更新"
+msgstr ""
 
 msgid "No log data."
-msgstr "无日志数据。"
+msgstr ""
 
 msgid "None"
-msgstr "无"
+msgstr ""
 
 msgid "Not Running"
-msgstr "未运行"
+msgstr ""
 
 msgid "Number of UDP connections to server."
-msgstr "到服务端的UDP连接数量"
+msgstr ""
 
 msgid "Off"
-msgstr "关闭"
+msgstr ""
 
 msgid "On"
-msgstr "开启"
+msgstr ""
 
 msgid "Package update failed."
-msgstr "软件包升级失败。"
+msgstr ""
 
 msgid "Pre-shared secret for client and server."
-msgstr "客户端和服务端的通信密码"
+msgstr ""
 
 msgid "Processing..."
-msgstr "正在操作..."
+msgstr ""
 
 msgid "Receive Window Size(num of packets)."
-msgstr "接收窗口大小 (数据包数量)"
+msgstr ""
 
 msgid "Reed-solomon Erasure Coding - datashard."
-msgstr "前向纠错 - datashard"
+msgstr ""
 
 msgid "Reed-solomon Erasure Coding - parityshard."
-msgstr "前向纠错 - parityshard"
+msgstr ""
 
 msgid "Refresh every 5 seconds."
-msgstr "每 5 秒刷新。"
+msgstr ""
 
 msgid "Run Daemon as User"
-msgstr "以该用户启动"
+msgstr ""
 
 msgid "Running"
-msgstr "运行中"
+msgstr ""
 
 msgid "Running Status"
-msgstr "运行状态"
+msgstr ""
 
 msgid "SNMP collect period, in seconds"
-msgstr "SNMP采集周期(秒)"
+msgstr ""
 
 msgid "Send Window Size(num of packets)."
-msgstr "发送窗口大小 (数据包数量)"
+msgstr ""
 
 msgid "Send/secv buffer size of udp sockets, default unit is MB."
-msgstr "发送/接收UDP数据包的缓冲区大小(MB)"
+msgstr ""
 
 msgid "Server"
-msgstr "服务端地址"
+msgstr ""
 
 msgid "Server Address"
-msgstr "服务端地址"
+msgstr ""
 
 msgid "Server List"
-msgstr "服务端列表"
+msgstr ""
 
 msgid "Server Manage"
-msgstr "服务端管理"
+msgstr ""
 
 msgid "Server Port"
-msgstr "服务端端口"
+msgstr ""
 
 msgid "Settings"
-msgstr "设置"
+msgstr ""
 
 msgid ""
 "The ARCH for checking updates. Note: Make sure OpenWrt/LEDE 'MIPS FPU "
 "Emulator' is enabled on MIPS/MIPSLE devices."
 msgstr ""
-"用于检查更新的 ARCH。注意: 在 MIPS/MIPSLE 设备上，请确保 OpenWrt/LEDE 的 "
-"'MIPS FPU Emulator' 已经启用。"
 
 msgid ""
-"The downloaded file is not suitable for current device. Please reselect ARCH."
-msgstr "下载的文件不适用于当前设备，请重新选择 ARCH。"
+"The client file is not suitable for current device. Please reselect ARCH."
+msgstr ""
 
 msgid "True"
-msgstr "是"
+msgstr ""
 
 msgid "Update Success."
-msgstr "更新成功！"
+msgstr ""
 
 msgid "Update in progress. Are you sure to close window?"
-msgstr "正在更新，确定关闭窗口？"
+msgstr ""
 
 msgid ""
-"You need to reload current page after update luci. Note that translation "
+"You may need to reload current page after update luci. Note that translation "
 "will not be updated."
-msgstr "更新 luci 之后你需要手动刷新当前页面。注意：翻译不会被更新"
+msgstr ""
 
 msgid "acknodelay"
 msgstr ""
@@ -297,7 +316,7 @@ msgid "nodelay"
 msgstr ""
 
 msgid "optional"
-msgstr "可选"
+msgstr ""
 
 msgid "parityshard"
 msgstr ""
